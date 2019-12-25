@@ -3,7 +3,6 @@
 extern crate strum;
 #[macro_use]
 extern crate strum_macros;
-use std::string::ToString;
 
 /// This struct defines a highlighting pair
 pub struct HighlightingPair<'t> {
