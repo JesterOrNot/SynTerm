@@ -36,7 +36,7 @@ pub enum Token {
     Keyword,
 }
 
-///[WIP] This will add syntax highlighting for the termianl
+/// [WIP] This will add syntax highlighting for the termianl
 pub fn syntax_terminal(the_lexer: Lexer) {
     // WIP
 }
