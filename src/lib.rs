@@ -4,17 +4,6 @@ extern crate strum;
 #[macro_use]
 extern crate strum_macros;
 
-/// This struct defines a highlighting pair
-pub struct HighlightingPair<'t> {
-    pub token: Token,
-    pub color: &'t str,
-}
-
-impl std::fmt::Display for HighlightingPair<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "(Token: {}, Color: {})", self.token, self.color)
-    }
-}
 
 /// This will split the input into tokens to parse later
 pub fn split_tokens(current_line: &str) -> Vec<&str> {
@@ -23,10 +12,10 @@ pub fn split_tokens(current_line: &str) -> Vec<&str> {
 
 ///[WIP] Lexer Structure
 pub struct Lexer {
-    items: Vec<HighlightingPair<'static>>,
+    items: std::collections::HashMap<Token, &'static str>,
 }
 
-#[derive(Display)]
+#[derive(Display, std::hash::Hash, std::cmp::Eq, std::cmp::PartialEq)]
 /// Add tokens enumeration
 pub enum Token {
     #[strum(serialize = "Number")]
@@ -43,5 +32,10 @@ impl Lexer {
     /// [WIP] This will add syntax highlighting for the termianl
     pub fn syntax_terminal(the_lexer: Lexer) {
         // WIP
+    }
+    pub fn new() -> Lexer {
+        Lexer{
+            items: std::collections::HashMap::new(),
+        }
     }
 }
