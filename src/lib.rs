@@ -10,6 +10,7 @@ pub struct HighlightingPair<'t> {
     pub token: Token,
     pub color: &'t str,
 }
+
 impl std::fmt::Display for HighlightingPair<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "(Token: {}, Color: {})", self.token, self.color)
@@ -31,8 +32,11 @@ pub struct Lexer {
 pub enum Token {
     #[strum(serialize = "Number")]
     Number,
+    #[strum(serialize = "Operator")]
     Operator,
+    #[strum(serialize = "Comment")]
     Comment,
+    #[strum(serialize = "Keyword")]
     Keyword,
 }
 
