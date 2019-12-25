@@ -14,7 +14,7 @@ pub fn split_tokens(current_line: &str) -> Vec<&str> {
 
 ///[WIP] Lexer Structure
 pub struct Lexer {
-    Items: Vec<HighlightingPair<'static>>,
+    items: Vec<HighlightingPair<'static>>,
 }
 
 /// Add tokens enumeration
@@ -26,6 +26,6 @@ pub enum Token {
 }
 
 ///[WIP] This will add syntax highlighting for the termianl
-pub fn SyntaxTerminal(the_lexer: Lexer) {
+pub fn syntax_terminal(the_lexer: Lexer) {
     // WIP
 }
