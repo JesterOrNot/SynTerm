@@ -1,7 +1,3 @@
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
+fn split_tokens(current_line: &str) -> Vec<&str> {
+    return current_line.split(" ").collect();
 }
