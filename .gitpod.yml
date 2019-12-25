@@ -3,3 +3,4 @@ image:
 
 tasks:
   - init: cargo build
+    command: cargo run --example example1
