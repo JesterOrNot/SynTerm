@@ -1,5 +1,6 @@
 #![crate_type = "lib"]
 #![crate_name = "synterm"]
+
 /// This struct defines a highlighting pair
 pub struct HighlightingPair<'t> {
     item: &'t str,
