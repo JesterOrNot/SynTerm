@@ -1,10 +1,19 @@
 #![crate_type = "lib"]
 #![crate_name = "synterm"]
+extern crate strum;
+#[macro_use]
+extern crate strum_macros;
+use std::string::ToString;
 
 /// This struct defines a highlighting pair
 pub struct HighlightingPair<'t> {
-    token: Token,
-    color: &'t str,
+    pub token: Token,
+    pub color: &'t str,
+}
+impl std::fmt::Display for HighlightingPair<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "(Token: {}, Color: {})", self.token, self.color)
+    }
 }
 
 /// This will split the input into tokens to parse later
@@ -17,8 +26,10 @@ pub struct Lexer {
     items: Vec<HighlightingPair<'static>>,
 }
 
+#[derive(Display)]
 /// Add tokens enumeration
 pub enum Token {
+    #[strum(serialize = "Number")]
     Number,
     Operator,
     Comment,
