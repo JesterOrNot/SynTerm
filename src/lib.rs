@@ -40,6 +40,8 @@ pub enum Token {
 }
 
 /// [WIP] This will add syntax highlighting for the termianl
-pub fn syntax_terminal(the_lexer: Lexer) {
-    // WIP
+impl Lexer {
+    pub fn syntax_terminal(the_lexer: Lexer) {
+        // WIP
+    }
 }
