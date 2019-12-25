@@ -7,7 +7,7 @@ extern crate strum_macros;
 
 /// This will split the input into tokens to parse later
 pub fn split_tokens(current_line: &str) -> Vec<&str> {
-    return current_line.split(" ").collect();
+    return current_line.split_whitespace().collect();
 }
 
 ///[WIP] Lexer Structure
