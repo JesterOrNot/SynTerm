@@ -1,2 +1,2 @@
 # SynTerm
-rust library for adding syntax highlighting to user input
+rust library for making beautiful REPLs and Shells with fish like as you type syntax highlighting
