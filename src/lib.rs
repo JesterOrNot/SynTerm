@@ -28,8 +28,8 @@ fn lines_from_file<T: AsRef<Path>>(filename: T) -> impl Iterator<Item = String> 
 #[allow(dead_code)]
 /// This Trait is how you make your command line tool
 pub trait CommandLineTool {
-    const prompt: &'static str = ">>> ";
-    const history_file_path: &'static str = "/tmp/history.txt";
+    const PROMPT: &'static str = ">>> ";
+    const HISTORY_FILE_PATH: &'static str = "/tmp/history.txt";
     fn syntax_highlighter() -> HashMap<&'static str, &'static str> {
         HashMap::new()
     }
@@ -44,17 +44,17 @@ pub trait CommandLineTool {
         let mut file = OpenOptions::new()
             .create(true)
             .write(true)
-            .open(Self::history_file_path)
+            .open(Self::HISTORY_FILE_PATH)
             .unwrap();
-        let mut positon = lines_from_file(Self::history_file_path).count();
+        let mut positon = lines_from_file(Self::HISTORY_FILE_PATH).count();
         let mut buffer = String::new();
         loop {
             // Move to the left, clear line, print prompt
-            print!("\x1b[1000D\x1b[0K{}\x1b[m", Self::prompt);
+            print!("\x1b[1000D\x1b[0K{}\x1b[m", Self::PROMPT);
             // Print buffer
             print!("{}", &buffer);
             // Move to the left and move to the right cursor position
-            print!("\x1b[1000D\x1b[{}C", cursor_position + Self::prompt.len());
+            print!("\x1b[1000D\x1b[{}C", cursor_position + Self::PROMPT.len());
             stdout().flush().unwrap();
             let event = read().unwrap();
             if let Event::Key(n) = event {
@@ -104,13 +104,13 @@ pub trait CommandLineTool {
                             if positon > 0 {
                                 positon -= 1;
                             }
-                            print!("\x1b[1000D\x1b[0K{}", Self::prompt);
+                            print!("\x1b[1000D\x1b[0K{}", Self::PROMPT);
                             buffer = Self::get_hist(positon);
                             print!("\x1b[1000D");
                             cursor_position = buffer.len();
                         }
                         KeyCode::Down => {
-                            if positon < lines_from_file(Self::history_file_path).count() {
+                            if positon < lines_from_file(Self::HISTORY_FILE_PATH).count() {
                                 positon += 1;
                             }
                             buffer = Self::get_hist(positon);
