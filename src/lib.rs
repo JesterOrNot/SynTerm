@@ -39,7 +39,7 @@ pub trait CommandLineTool {
             None => "".to_string(),
         }
     }
-    fn init(&self) {
+    fn start(&self) {
         let mut cursor_position = 0;
         let mut file = OpenOptions::new()
             .create(true)

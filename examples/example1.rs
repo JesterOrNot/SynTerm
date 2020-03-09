@@ -10,6 +10,6 @@ impl CommandLineTool for MyTool {
 }
 
 fn main() {
-    let f = MyTool;
-    f.init();
+    let command_line = MyTool;
+    command_line.start();
 }
