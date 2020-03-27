@@ -3,7 +3,6 @@
   - Auto Completion -- Add an autocomplete API
   - Hints -- Add a hinting API
   - Cross platform -- Make it not dependant on ANSI escape codes as it can help
-  - Abstract -- Abstract ANSI codes
 
 # Enhancements
   - Modularity -- Refactor code into smaller functions

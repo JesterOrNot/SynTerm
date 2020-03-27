@@ -2,10 +2,33 @@ use crossterm::{
     event::{read, Event, KeyCode, KeyModifiers},
     terminal::{disable_raw_mode, enable_raw_mode},
 };
+use std::fmt;
 use std::fs::{File, OpenOptions};
 use std::io::{stdout, BufRead, BufReader, Write};
 use std::path::Path;
 use std::process::exit;
+
+/// A wrapper around ANSI codes
+pub enum Color {
+    Red,
+    Green,
+    Yellow,
+    Blue,
+    Magenta,
+    Cyan
+}
+impl fmt::Display for Color {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+       match *self {
+           Self::Red => write!(f, "31"),
+           Self::Green => write!(f, "32"),
+           Self::Yellow => write!(f, "33"),
+           Self::Blue => write!(f, "34"),
+           Self::Magenta => write!(f, "35"),
+           Self::Cyan => write!(f, "36")
+       }
+    }
+}
 
 fn lines_from_file<T: AsRef<Path>>(filename: T) -> impl Iterator<Item = String> {
     let file = File::open(filename);
@@ -52,7 +75,7 @@ macro_rules! gen_lexer {
 
 #[macro_export]
 macro_rules! gen_parse {
-    ($enumName:ident, $funcName:ident, $(($token:ident, $ansi:literal)), *) => {
+    ($enumName:ident, $funcName:ident, $(($token:ident, $ansi:expr)), *) => {
         use logos::{Logos, Lexer};
         fn $funcName(mut tokens: Lexer<$enumName, &str>) {
             while tokens.token != $enumName::End {
@@ -80,16 +103,20 @@ macro_rules! gen_parse {
 }
 
 #[allow(dead_code)]
-/// This Trait is how you make your command line tool
+/// This Trait is how you make your command line tool it is the center of all synterm programs
 pub trait CommandLineTool {
+    /// The input prompt defaults to `>>> `
     const PROMPT: &'static str = ">>> ";
+    /// Path to the history file defaults to `/tmp/history.txt`
     const HISTORY_FILE_PATH: &'static str = "/tmp/history.txt";
+    /// Do not implement! This is used internally
     fn get_hist(n: usize) -> String {
         match lines_from_file(Self::HISTORY_FILE_PATH).nth(n) {
             Some(n) => n,
             None => "".to_string(),
         }
     }
+    /// Starts the REPL
     fn start(&self) {
         let mut cursor_position = 0;
         let mut file = OpenOptions::new()
@@ -196,6 +223,45 @@ pub trait CommandLineTool {
             }
         }
     }
+    /// This drives the syntax highlighting it should consist 2 macros and one function call
+    /// <br>
+    /// First `gen_lexer!` this will generate the lexers this will take the following paramaters
+    /// 1. enumName this will be the name of the enum that will serve as our tokens put an identifier here that hasn't been used i.e. `gen_lexer!(TheLexer)`
+    /// 2. args this is as many as you want and will actually define new tokens, for each pattern of creating tokens you want add the following pair (Identifier, Regex) i.e. `(Number, r"[0-9]+")`  a full example might look like this
+    /// ```rust
+    /// gen_lexer!(TheLexer, (Foo, "foo"), (Bar, "bar"));
+    /// ```
+    /// Second we have `gen_parse!` which will create our parser which will be applying our syntax highlighting and it will take the following arguments
+    /// 1. enumName -- just put in whatever you named your enum with `gen_lexer!`
+    /// 2. funcName -- put in the name of your parser method
+    /// 3. args -- This also goes in the form of pairs and here you put in the pattern (TokenName, Color Color) here is an example we will base it off the snippet for `gen_lexer!` (we get the Color enum from `syntem::Color`) (Foo, Color::Red) this will make red come out as red
+    /// <br>
+    /// Here is a final example
+    /// ```rust
+    /// gen_parse!(TheLexer, parser, (Foo, Color::Red), (Bar, Color::Green));
+    /// ```
+    /// <br>
+    /// 
+    /// Finally one more thing call the parse function we create with `gen_parse!` in which one calls
+    /// <br>
+    /// ParserName(TokenNames::lexer(string));
+    /// from the last 2 snippets it is
+    /// 
+    /// ```rust
+    /// parser(TheLexer::lexer(string));
+    /// ```
+    /// 
+    /// <br>
+    /// 
+    /// Lets put this together
+    /// 
+    /// ```rust
+    /// fn syntax_highlight(string: &str) {
+    ///     gen_lexer!(TheLexer, (Foo, "foo"), (Bar, "bar"));
+    ///     gen_parse!(TheLexer, parser, (Foo, Color::Red), (Bar, Color::Green));
+    ///     parser(TheLexer::lexer(string));
+    /// }
+    /// ```
     fn syntax_highlight(string: &str) {
         gen_lexer!(TheLexer);
         gen_parse!(TheLexer, parse);
