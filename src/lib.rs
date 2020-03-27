@@ -97,7 +97,7 @@ pub trait CommandLineTool {
             .write(true)
             .open(Self::HISTORY_FILE_PATH)
             .unwrap();
-        let mut position = 0;
+        let mut position = lines_from_file(Self::HISTORY_FILE_PATH).count();
         let mut buffer = String::new();
         loop {
             enable_raw_mode().unwrap();
@@ -170,12 +170,12 @@ pub trait CommandLineTool {
                         KeyCode::Enter => match buffer.as_str() {
                             "" => {
                                 println!("\r");
-                                position = 0;
+                                position = lines_from_file(Self::HISTORY_FILE_PATH).count();
                             }
                             _ => {
                                 println!("\r");
                                 file.write_all(format!("{}\n", buffer).as_bytes()).unwrap();
-                                position = 0;
+                                position = lines_from_file(Self::HISTORY_FILE_PATH).count();
                                 disable_raw_mode().unwrap();
                                 let output = Self::evaluator_function(&buffer);
                                 println!("{}\r", output);
