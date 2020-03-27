@@ -2,4 +2,4 @@ FROM gitpod/workspace-full
 
 USER gitpod
 
-RUN cargo install cargo-expand
+RUN bash -cl "cargo install cargo-expand"
