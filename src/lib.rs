@@ -60,14 +60,32 @@ macro_rules! gen_parse {
     };
 }
 
+#[macro_export]
+macro_rules! apply_args {
+
+    ($string:ident, $(($token:ident, $ansi:literal, $vals:literal)), *) => {
+        $(
+            gen_lexer!(TheLexer, ($token, $vals));
+            gen_parse!(TheLexer, parser, ($token, $ansi));
+            parser(TheLexer::lexer(&$string))
+        )*
+    }
+}
+
+macro_rules! syntax_highlight {
+
+    ($string:ident, $(($token:ident, $ansi:literal, $vals:literal)), *) => {
+        $(
+            apply_args!()
+        )*
+    }
+}
+
 #[allow(dead_code)]
 /// This Trait is how you make your command line tool
 pub trait CommandLineTool {
     const PROMPT: &'static str = ">>> ";
     const HISTORY_FILE_PATH: &'static str = "/tmp/history.txt";
-    fn syntax_highlighter() -> HashMap<&'static str, &'static str> {
-        HashMap::new()
-    }
     fn get_hist(n: usize) -> String {
         match lines_from_file("").nth(n) {
             Some(n) => n,
@@ -87,7 +105,7 @@ pub trait CommandLineTool {
             // Move to the left, clear line, print prompt
             print!("\x1b[1000D\x1b[0K{}\x1b[m", Self::PROMPT);
             // Print buffer
-            print!("{}", &buffer);
+            apply_args!(buffer, (Foo, "31", "foo"));
             // Move to the left and move to the right cursor position
             print!("\x1b[1000D\x1b[{}C", cursor_position + Self::PROMPT.len());
             stdout().flush().unwrap();
@@ -176,7 +194,4 @@ pub trait CommandLineTool {
     }
     /// This should take a line and return the evaluated output after evaluation
     fn evaluator_function(line: &String) -> String;
-    fn print_buffer(&self, buffer: &str) {
-        // parse()
-    }
 }
