@@ -32,7 +32,7 @@ macro_rules! gen_lexer {
             #[token = " "]
             Whitespace,
             $(
-                #[token = $target]
+                #[regex = $target]
                 $token,
             )*
         }
