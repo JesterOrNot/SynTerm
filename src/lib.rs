@@ -126,7 +126,6 @@ pub trait CommandLineTool {
                                         exit(0);
                                     }
                                     _ => {
-                                        println!("^{}", v.to_uppercase());
                                         continue;
                                     }
                                 }
