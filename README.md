@@ -9,7 +9,7 @@ A Rust library for making beautiful REPLs and Shells with fish like as you type 
 Add the following to your Cargo.toml's dependency section
 
 ```toml
-synterm = "0.1.2"
+synterm = "0.2.0"
 logos = "0.9.7"
 ```
 

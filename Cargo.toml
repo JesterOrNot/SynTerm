@@ -1,7 +1,7 @@
 [package]
 name = "synterm"
 description = "A Rust library for making beautiful REPLs and Shells with fish like as you type syntax highlighting"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Sean Hellum <seanhellum45@gmail.com>"]
 edition = "2018"
 license = "MIT"
