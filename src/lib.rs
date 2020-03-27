@@ -1,14 +1,8 @@
-#![crate_type = "lib"]
-#![crate_name = "synterm"]
-
 use crossterm::{
     event::{read, Event, KeyCode, KeyModifiers},
     terminal::{disable_raw_mode, enable_raw_mode},
 };
-use logos::{Lexer, Logos};
-use std::collections::HashMap;
-use std::env::{current_dir, var};
-use std::fs::{create_dir_all, File, OpenOptions};
+use std::fs::{File, OpenOptions};
 use std::io::{stdout, BufRead, BufReader, Write};
 use std::path::Path;
 use std::process::exit;
@@ -82,15 +76,6 @@ macro_rules! gen_parse {
                 tokens.advance();
             }
         }
-    }
-}
-
-macro_rules! syntax_highlight {
-
-    ($string:ident, $(($token:ident, $ansi:literal, $vals:literal)), *) => {
-        $(
-            apply_args!()
-        )*
     }
 }
 

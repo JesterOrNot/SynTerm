@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::process::exit;
 use synterm::{CommandLineTool, gen_lexer, gen_parse};
 
