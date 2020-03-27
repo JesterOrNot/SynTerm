@@ -26,6 +26,7 @@ fn lines_from_file<T: AsRef<Path>>(filename: T) -> impl Iterator<Item = String> 
     buf.lines().map(|l| l.expect("Could not parse line"))
 }
 
+#[macro_export]
 macro_rules! gen_lexer {
     ($enumName:ident, $(($token:ident,$target:literal)), *) => {
         #[derive(Logos, Debug, Clone, PartialEq, Eq)]
@@ -44,8 +45,10 @@ macro_rules! gen_lexer {
     };
 }
 
+#[macro_export]
 macro_rules! gen_parse {
     ($enumName:ident, $funcName:ident, $(($token:ident, $ansi:literal)), *) => {
+        use logos::{Logos, Lexer};
         fn $funcName(mut tokens: Lexer<$enumName, &str>) {
             while tokens.token != $enumName::End {
                 match tokens.token {
@@ -58,18 +61,6 @@ macro_rules! gen_parse {
             }
         }
     };
-}
-
-#[macro_export]
-macro_rules! apply_args {
-
-    ($string:ident, $(($token:ident, $ansi:literal, $vals:literal)), *) => {
-        $(
-            gen_lexer!(TheLexer, ($token, $vals));
-            gen_parse!(TheLexer, parser, ($token, $ansi));
-            parser(TheLexer::lexer(&$string))
-        )*
-    }
 }
 
 macro_rules! syntax_highlight {
@@ -105,7 +96,7 @@ pub trait CommandLineTool {
             // Move to the left, clear line, print prompt
             print!("\x1b[1000D\x1b[0K{}\x1b[m", Self::PROMPT);
             // Print buffer
-            apply_args!(buffer, (Foo, "31", "foo"));
+            Self::syntax_highlight(&buffer);
             // Move to the left and move to the right cursor position
             print!("\x1b[1000D\x1b[{}C", cursor_position + Self::PROMPT.len());
             stdout().flush().unwrap();
@@ -192,6 +183,8 @@ pub trait CommandLineTool {
             }
         }
     }
+    //
+    fn syntax_highlight(string: &str);
     /// This should take a line and return the evaluated output after evaluation
     fn evaluator_function(line: &String) -> String;
 }
