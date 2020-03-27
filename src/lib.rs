@@ -95,6 +95,7 @@ pub trait CommandLineTool {
         let mut file = OpenOptions::new()
             .create(true)
             .write(true)
+            .append(true)
             .open(Self::HISTORY_FILE_PATH)
             .unwrap();
         let mut position = lines_from_file(Self::HISTORY_FILE_PATH).count();
@@ -154,6 +155,8 @@ pub trait CommandLineTool {
                         KeyCode::Up => {
                             if position > 0 {
                                 position -= 1;
+                            } else {
+                                position = lines_from_file(Self::HISTORY_FILE_PATH).count();
                             }
                             print!("\x1b[1000D\x1b[0K{}", Self::PROMPT);
                             buffer = Self::get_hist(position);
@@ -163,6 +166,8 @@ pub trait CommandLineTool {
                         KeyCode::Down => {
                             if position < lines_from_file(Self::HISTORY_FILE_PATH).count() {
                                 position += 1;
+                            } else {
+                                position = 0;
                             }
                             buffer = Self::get_hist(position);
                             cursor_position = buffer.len();
