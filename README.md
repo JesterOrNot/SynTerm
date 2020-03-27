@@ -45,6 +45,11 @@ synterm = "0.2.11"
 logos = "0.9.7"
 ```
 
+## Examples
+
+  - [JesterOrNot/PyRepl](https://github.com/JesterOrNot/PyRepl)
+  - [JesterOrNot/MathRepl](https://github.com/JesterOrNot/MathRepl)
+
 ## Contributing
 
 See TODO.md for ways to contribute
