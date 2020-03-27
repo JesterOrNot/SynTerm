@@ -43,6 +43,17 @@ macro_rules! gen_lexer {
             )*
         }
     };
+    ($enumName:ident) => {
+        #[derive(Logos, Debug, Clone, PartialEq, Eq)]
+        enum $enumName {
+            #[end]
+            End,
+            #[error]
+            Error,
+            #[token = " "]
+            Whitespace
+        }
+    };
 }
 
 #[macro_export]
@@ -61,6 +72,17 @@ macro_rules! gen_parse {
             }
         }
     };
+    ($enumName:ident, $funcName:ident) => {
+        use logos::{Logos, Lexer};
+        fn $funcName(mut tokens: Lexer<$enumName, &str>) {
+            while tokens.token != $enumName::End {
+                match tokens.token {
+                    _ => print!("{}", tokens.slice())
+                }
+                tokens.advance();
+            }
+        }
+    }
 }
 
 macro_rules! syntax_highlight {
@@ -184,8 +206,11 @@ pub trait CommandLineTool {
             }
         }
     }
-    //
-    fn syntax_highlight(string: &str);
+    fn syntax_highlight(string: &str) {
+        gen_lexer!(TheLexer);
+        gen_parse!(TheLexer, parse);
+        parse(TheLexer::lexer(string));
+    }
     /// This should take a line and return the evaluated output after evaluation
     fn evaluator_function(line: &String) -> String;
 }
