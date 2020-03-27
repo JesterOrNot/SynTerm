@@ -100,7 +100,7 @@ pub trait CommandLineTool {
     const PROMPT: &'static str = ">>> ";
     const HISTORY_FILE_PATH: &'static str = "/tmp/history.txt";
     fn get_hist(n: usize) -> String {
-        match lines_from_file("").nth(n) {
+        match lines_from_file(Self::HISTORY_FILE_PATH).nth(n) {
             Some(n) => n,
             None => "".to_string(),
         }
@@ -112,7 +112,7 @@ pub trait CommandLineTool {
             .write(true)
             .open(Self::HISTORY_FILE_PATH)
             .unwrap();
-        let mut positon = lines_from_file(Self::HISTORY_FILE_PATH).count();
+        let mut position = 0;
         let mut buffer = String::new();
         loop {
             enable_raw_mode().unwrap();
@@ -168,29 +168,30 @@ pub trait CommandLineTool {
                             }
                         }
                         KeyCode::Up => {
-                            if positon > 0 {
-                                positon -= 1;
+                            if position > 0 {
+                                position -= 1;
                             }
                             print!("\x1b[1000D\x1b[0K{}", Self::PROMPT);
-                            buffer = Self::get_hist(positon);
+                            buffer = Self::get_hist(position);
                             print!("\x1b[1000D");
                             cursor_position = buffer.len();
                         }
                         KeyCode::Down => {
-                            if positon < lines_from_file(Self::HISTORY_FILE_PATH).count() {
-                                positon += 1;
+                            if position < lines_from_file(Self::HISTORY_FILE_PATH).count() {
+                                position += 1;
                             }
-                            buffer = Self::get_hist(positon);
+                            buffer = Self::get_hist(position);
                             cursor_position = buffer.len();
                         }
                         KeyCode::Enter => match buffer.as_str() {
                             "" => {
                                 println!("\r");
+                                position = 0;
                             }
                             _ => {
                                 println!("\r");
                                 file.write_all(format!("{}\n", buffer).as_bytes()).unwrap();
-                                positon += 1;
+                                position = 0;
                                 disable_raw_mode().unwrap();
                                 let output = Self::evaluator_function(&buffer);
                                 println!("{}\r", output);
