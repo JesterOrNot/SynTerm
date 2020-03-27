@@ -93,6 +93,7 @@ pub trait CommandLineTool {
         let mut positon = lines_from_file(Self::HISTORY_FILE_PATH).count();
         let mut buffer = String::new();
         loop {
+            enable_raw_mode().unwrap();
             // Move to the left, clear line, print prompt
             print!("\x1b[1000D\x1b[0K{}\x1b[m", Self::PROMPT);
             // Print buffer
