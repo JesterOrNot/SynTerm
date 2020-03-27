@@ -263,7 +263,6 @@ pub trait CommandLineTool {
     /// }
     /// ```
     fn syntax_highlight(string: &str) {
-        use logos::Logos;
         gen_lexer!(TheLexer);
         gen_parse!(TheLexer, parse);
         parse(TheLexer::lexer(string));
