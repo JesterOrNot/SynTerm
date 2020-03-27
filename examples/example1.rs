@@ -8,8 +8,8 @@ impl CommandLineTool for MyTool {
         format!("Line: {}", line)
     }
     fn syntax_highlight(string: &str) {
-        gen_lexer!(TheLexer, (Foo, "foo"));
-        gen_parse!(TheLexer, parser, (Foo,"31"));
+        gen_lexer!(TheLexer, (Foo, "foo"), (Bar, "bar"));
+        gen_parse!(TheLexer, parser, (Foo,"31"), (Bar,"32"));
         parser(TheLexer::lexer(string));
     }
 }
