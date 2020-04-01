@@ -8,7 +8,7 @@ use std::{
     fs::{File, OpenOptions},
     io::{stdout, BufRead, BufReader, Write},
     path::Path,
-    process::exit
+    process::exit,
 };
 
 /// A wrapper around ANSI codes
@@ -18,19 +18,19 @@ pub enum Color {
     Yellow,
     Blue,
     Magenta,
-    Cyan
+    Cyan,
 }
 
 impl fmt::Display for Color {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-       match *self {
-           Self::Red => write!(f, "31"),
-           Self::Green => write!(f, "32"),
-           Self::Yellow => write!(f, "33"),
-           Self::Blue => write!(f, "34"),
-           Self::Magenta => write!(f, "35"),
-           Self::Cyan => write!(f, "36")
-       }
+        match *self {
+            Self::Red => write!(f, "31"),
+            Self::Green => write!(f, "32"),
+            Self::Yellow => write!(f, "33"),
+            Self::Blue => write!(f, "34"),
+            Self::Magenta => write!(f, "35"),
+            Self::Cyan => write!(f, "36"),
+        }
     }
 }
 
@@ -250,11 +250,11 @@ pub trait CommandLineTool {
     /// <br>
     /// ParserName(TokenNames::lexer(string));
     /// from the last 2 snippets it is `parser(TheLexer::lexer(string));`
-    /// 
+    ///
     /// <br>
-    /// 
+    ///
     /// Lets put this together
-    /// 
+    ///
     /// ```rust
     /// use synterm::{syntax_highlight_gen, Color};
     /// fn syntax_highlight(string: &str) {
