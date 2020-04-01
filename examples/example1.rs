@@ -1,5 +1,5 @@
 use std::process::exit;
-use synterm::{CommandLineTool, gen_lexer, gen_parse, Color};
+use synterm::{CommandLineTool, gen_lexer, gen_parse, syntax_highlight_gen, Color};
 
 struct MyTool;
 
@@ -15,8 +15,7 @@ impl CommandLineTool for MyTool {
         }
     }
     fn syntax_highlight(string: &str) {
-        gen_lexer!(TheLexer, (Foo, "foo"), (Bar, "bar"));
-        gen_parse!(TheLexer, parser, (Foo, Color::Red), (Bar, Color::Green));
+        syntax_highlight_gen!(TheLexer, parser, (Foo, Color::Red, "foo"), (Bar, Color::Green, "bar"));
         parser(TheLexer::lexer(string));
     }
 }

@@ -2,11 +2,14 @@ use crossterm::{
     event::{read, Event, KeyCode, KeyModifiers},
     terminal::{disable_raw_mode, enable_raw_mode},
 };
-use std::fmt;
-use std::fs::{File, OpenOptions};
-use std::io::{stdout, BufRead, BufReader, Write};
-use std::path::Path;
-use std::process::exit;
+
+use std::{
+    fmt,
+    fs::{File, OpenOptions},
+    io::{stdout, BufRead, BufReader, Write},
+    path::Path,
+    process::exit
+};
 
 /// A wrapper around ANSI codes
 pub enum Color {
@@ -17,6 +20,7 @@ pub enum Color {
     Magenta,
     Cyan
 }
+
 impl fmt::Display for Color {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
        match *self {
@@ -100,6 +104,15 @@ macro_rules! gen_parse {
             }
         }
     }
+}
+
+#[macro_export]
+macro_rules! syntax_highlight_gen {
+    ($enumName:ident, $funcName:ident, $(($token:ident, $ansi:expr, $target:literal)), *) => {
+        use synterm::{gen_lexer, gen_parse};
+        gen_lexer!($enumName, $(($token, $target)),*);
+        gen_parse!($enumName, $funcName, $(($token, $ansi)),*);
+    };
 }
 
 #[allow(dead_code)]
@@ -223,42 +236,29 @@ pub trait CommandLineTool {
             }
         }
     }
-    /// This drives the syntax highlighting it should consist 2 macros and one function call
+    /// This drives the syntax highlighting it should consist of one macro and function call
     /// <br>
-    /// First `gen_lexer!` this will generate the lexers this will take the following paramaters
+    /// First the macro cll is `syntax_highlight_gen!` this will generate the lexers this will take the following paramaters
     /// 1. enumName this will be the name of the enum that will serve as our tokens put an identifier here that hasn't been used i.e. `gen_lexer!(TheLexer)`
-    /// 2. args this is as many as you want and will actually define new tokens, for each pattern of creating tokens you want add the following pair (Identifier, Regex) i.e. `(Number, r"[0-9]+")`  a full example might look like this
-    /// ```rust
-    /// gen_lexer!(TheLexer, (Foo, "foo"), (Bar, "bar"));
-    /// ```
-    /// Second we have `gen_parse!` which will create our parser which will be applying our syntax highlighting and it will take the following arguments
-    /// 1. enumName -- just put in whatever you named your enum with `gen_lexer!`
     /// 2. funcName -- put in the name of your parser method
-    /// 3. args -- This also goes in the form of pairs and here you put in the pattern (TokenName, Color Color) here is an example we will base it off the snippet for `gen_lexer!` (we get the Color enum from `syntem::Color`) (Foo, Color::Red) this will make red come out as red
-    /// <br>
-    /// Here is a final example
+    /// 3. args this is as many as you want and will actually define new tokens, for each pattern of creating tokens you want add the following pair (Identifier, Color, Regex) i.e. `(Number, Color::Red, r"[0-9]+")`  (we get the Color enum from `syntem::Color`) a full example might look like this
     /// ```rust
-    /// gen_parse!(TheLexer, parser, (Foo, Color::Red), (Bar, Color::Green));
+    /// use synterm::{syntax_highlight_gen, Color};
+    /// syntax_highlight_gen!(TheLexer, parser, (Foo, Color::Red, "foo"), (Bar, Color::Green, "bar"));
     /// ```
-    /// <br>
-    /// 
-    /// Finally one more thing call the parse function we create with `gen_parse!` in which one calls
+    /// Now for the function call the parse function we create with `syntax_highlight_gen!` in which one calls
     /// <br>
     /// ParserName(TokenNames::lexer(string));
-    /// from the last 2 snippets it is
-    /// 
-    /// ```rust
-    /// parser(TheLexer::lexer(string));
-    /// ```
+    /// from the last 2 snippets it is `parser(TheLexer::lexer(string));`
     /// 
     /// <br>
     /// 
     /// Lets put this together
     /// 
     /// ```rust
+    /// use synterm::{syntax_highlight_gen, Color};
     /// fn syntax_highlight(string: &str) {
-    ///     gen_lexer!(TheLexer, (Foo, "foo"), (Bar, "bar"));
-    ///     gen_parse!(TheLexer, parser, (Foo, Color::Red), (Bar, Color::Green));
+    ///     syntax_highlight_gen!(TheLexer, parser, (Foo, Color::Red, "foo"), (Bar, Color::Green, "bar"));
     ///     parser(TheLexer::lexer(string));
     /// }
     /// ```
