@@ -17,7 +17,8 @@ impl CommandLineTool for MyTool {
             TheLexer,
             parser,
             (Foo, Color::Red, "foo"),
-            (Bar, Color::Green, "bar")
+            (Bar, Color::Green, "bar"),
+            (Baz, Color::Blue, "baz")
         );
         parser(TheLexer::lexer(string));
     }
