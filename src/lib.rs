@@ -2,11 +2,11 @@ use crossterm::{
     event::{read, Event, KeyCode, KeyModifiers},
     terminal::{disable_raw_mode, enable_raw_mode},
 };
-
+use termion::is_tty;
 use std::{
     fmt,
     fs::{File, OpenOptions},
-    io::{stdout, BufRead, BufReader, Write},
+    io::{stdout, BufRead, BufReader, Write, stdin},
     path::Path,
     process::exit,
 };
@@ -129,8 +129,19 @@ pub trait CommandLineTool {
             None => "".to_string(),
         }
     }
-    /// Starts the REPL
+
     fn start(&self) {
+        if is_tty(&File::open("/dev/stdin").unwrap()) {
+            self.repl();
+            exit(0)
+        }
+        let mut buffer = String::new();
+        stdin().read_line(&mut buffer).unwrap();
+        print!("{}", Self::evaluator_function(&buffer));
+    }
+
+    /// Starts the REPL
+    fn repl(&self) {
         let mut cursor_position = 0;
         let mut file = OpenOptions::new()
             .create(true)

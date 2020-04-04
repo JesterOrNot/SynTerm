@@ -25,6 +25,5 @@ impl CommandLineTool for MyTool {
 }
 
 fn main() {
-    let command_line = MyTool;
-    command_line.start();
+    MyTool.start();
 }
