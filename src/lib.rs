@@ -11,7 +11,7 @@ use std::{
     process::exit,
 };
 
-/// A wrapper around ANSI codes
+/// A wrapper around ANSI escape sequences
 pub enum Color {
     Red,
     Green,
