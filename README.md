@@ -8,7 +8,7 @@ A Rust library for making beautiful REPLs and Shells with fish like as you type 
 
 ```rust
 use std::process::exit;
-use synterm::{CommandLineTool, gen_lexer, gen_parse, Color};
+use synterm::{gen_lexer, gen_parse, syntax_highlight_gen, Color, CommandLineTool};
 
 struct MyTool;
 
@@ -18,21 +18,23 @@ impl CommandLineTool for MyTool {
             "exit" => {
                 exit(0);
             }
-            _ => {
-                format!("Line: {}", line)
-            }
+            _ => format!("Line: {}", line),
         }
     }
     fn syntax_highlight(string: &str) {
-        gen_lexer!(TheLexer, (Foo, "foo"), (Bar, "bar"));
-        gen_parse!(TheLexer, parser, (Foo, Color::Red), (Bar, Color::Green));
+        syntax_highlight_gen!(
+            TheLexer,
+            parser,
+            (Foo, Color::Red, "foo"),
+            (Bar, Color::Green, "bar"),
+            (Baz, Color::Blue, "baz")
+        );
         parser(TheLexer::lexer(string));
     }
 }
 
 fn main() {
-    let command_line = MyTool;
-    command_line.start();
+    MyTool.start();
 }
 ```
 
