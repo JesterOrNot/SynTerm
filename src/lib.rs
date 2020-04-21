@@ -67,7 +67,7 @@ pub fn calculate_whitespace(string: &str) -> usize {
             }
         }
     }
-   result
+    result
 }
 
 #[macro_export]
@@ -181,7 +181,10 @@ pub trait CommandLineTool {
             // Print buffer
             Self::syntax_highlight(&buffer);
             // Move to the left and move to the right cursor position
-            print!("\x1b[1000D\x1b[{}C", cursor_position + calculate_whitespace(Self::PROMPT));
+            print!(
+                "\x1b[1000D\x1b[{}C",
+                cursor_position + calculate_whitespace(Self::PROMPT)
+            );
             stdout().flush().unwrap();
             let event = read().unwrap();
             if let Event::Key(n) = event {
