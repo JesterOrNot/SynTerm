@@ -4,6 +4,7 @@ use synterm::{gen_lexer, gen_parse, syntax_highlight_gen, Color, CommandLineTool
 struct MyTool;
 
 impl CommandLineTool for MyTool {
+    const PROMPT: &'static str = "\x01\x1b[1;33m\x02>>> \x01\x1b[m\x02";
     fn evaluator_function(line: &String) -> String {
         match line.as_str() {
             "exit" => {
@@ -16,9 +17,10 @@ impl CommandLineTool for MyTool {
         syntax_highlight_gen!(
             TheLexer,
             parser,
-            (Foo, Color::Red, r"foo"),
-            (Bar, Color::Green, r"bar"),
-            (Baz, Color::Blue, r"baz")
+            (Red, Color::Red, "red"),
+            (Green, Color::Green, "green"),
+            (Blue, Color::Blue, "blue"),
+            (NoHighlight, Color::White, "[a-zA-Z0-9_$]+")
         );
         parser(TheLexer::lexer(string));
     }

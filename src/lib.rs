@@ -2,14 +2,14 @@ use crossterm::{
     event::{read, Event, KeyCode, KeyModifiers},
     terminal::{disable_raw_mode, enable_raw_mode},
 };
-use termion::is_tty;
 use std::{
     fmt,
     fs::{File, OpenOptions},
-    io::{stdout, BufRead, BufReader, Write, stdin},
+    io::{stdin, stdout, BufRead, BufReader, Write},
     path::Path,
     process::exit,
 };
+use termion::is_tty;
 
 /// A wrapper around ANSI escape sequences
 pub enum Color {
@@ -18,12 +18,14 @@ pub enum Color {
     Yellow,
     Blue,
     Magenta,
+    White,
     Cyan,
 }
 
 impl fmt::Display for Color {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
+            Self::White => write!(f, "26"),
             Self::Red => write!(f, "31"),
             Self::Green => write!(f, "32"),
             Self::Yellow => write!(f, "33"),
@@ -45,6 +47,27 @@ fn lines_from_file<T: AsRef<Path>>(filename: T) -> impl Iterator<Item = String> 
     };
     let buf = BufReader::new(file);
     buf.lines().map(|l| l.expect("Could not parse line"))
+}
+
+pub fn calculate_whitespace(string: &str) -> usize {
+    let mut result = 0;
+    let string = string.to_owned().into_bytes();
+    let mut it = string.iter().peekable();
+    while let Some(&c) = &it.peek() {
+        match c {
+            b'\x01' => {
+                while it.peek().is_some() && **it.peek().unwrap() != b'\x02' {
+                    it.next();
+                }
+                it.next();
+            }
+            _ => {
+                result += 1;
+                it.next();
+            }
+        }
+    }
+   result
 }
 
 #[macro_export]
@@ -158,7 +181,7 @@ pub trait CommandLineTool {
             // Print buffer
             Self::syntax_highlight(&buffer);
             // Move to the left and move to the right cursor position
-            print!("\x1b[1000D\x1b[{}C", cursor_position + Self::PROMPT.len());
+            print!("\x1b[1000D\x1b[{}C", cursor_position + calculate_whitespace(Self::PROMPT));
             stdout().flush().unwrap();
             let event = read().unwrap();
             if let Event::Key(n) = event {

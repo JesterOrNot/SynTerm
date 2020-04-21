@@ -7,5 +7,11 @@ github:
     addBadge: true
     addLabel: ready-to-code
 tasks:
-  - init: cargo build
+  - name: example1
+    init: echo 'exit' | cargo run --example example1
     command: cargo run --example example1
+  - name: color_prompt
+    init: echo 'exit' | cargo run --example color_prompt
+    command: cargo run --example color_prompt
+  - name: Testing
+    init: cargo test
