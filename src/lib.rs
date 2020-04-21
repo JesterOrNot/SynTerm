@@ -260,7 +260,7 @@ pub trait CommandLineTool {
                                 position = lines_from_file(Self::HISTORY_FILE_PATH).count();
                                 disable_raw_mode().unwrap();
                                 let output = Self::evaluator_function(&buffer);
-                                println!("{}\r", output);
+                                println!("{}", output);
                                 enable_raw_mode().unwrap();
                                 print!("\r");
                                 cursor_position = 0;
