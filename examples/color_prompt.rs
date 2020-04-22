@@ -18,6 +18,7 @@ impl CommandLineTool for MyTool {
             TheLexer,
             parser,
             (Red, Color::Red, "red"),
+            (Keyword, Color::Yellow, "exit"),
             (Green, Color::Green, "green"),
             (Blue, Color::Blue, "blue"),
             (NoHighlight, Color::White, "[a-zA-Z0-9_$]+")
