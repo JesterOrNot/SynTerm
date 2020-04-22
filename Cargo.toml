@@ -9,6 +9,5 @@ repository = "https://github.com/JesterOrNot/SynTerm"
 readme = "README.md"
 
 [dependencies]
-crossterm = "0.16.0"
-termion = "1.5.5"
-logos = "0.9.7"
+crossterm = "0.17.3"
+logos = "0.11"

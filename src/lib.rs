@@ -1,6 +1,7 @@
 use crossterm::{
     event::{read, Event, KeyCode, KeyModifiers},
     terminal::{disable_raw_mode, enable_raw_mode},
+    tty::IsTty
 };
 use std::{
     fmt,
@@ -9,7 +10,6 @@ use std::{
     path::Path,
     process::exit,
 };
-use termion::is_tty;
 
 /// A wrapper around ANSI escape sequences
 pub enum Color {
@@ -75,14 +75,12 @@ macro_rules! gen_lexer {
     ($enumName:ident, $(($token:ident,$target:literal)), *) => {
         #[derive(Logos, Debug, Clone, PartialEq, Eq)]
         enum $enumName {
-            #[end]
-            End,
             #[error]
             Error,
-            #[token = " "]
+            #[token(" ")]
             Whitespace,
             $(
-                #[regex = $target]
+                #[regex($target)]
                 $token,
             )*
         }
@@ -90,11 +88,9 @@ macro_rules! gen_lexer {
     ($enumName:ident) => {
         #[derive(Logos, Debug, Clone, PartialEq, Eq)]
         enum $enumName {
-            #[end]
-            End,
             #[error]
             Error,
-            #[token = " "]
+            #[token(" ")]
             Whitespace
         }
     };
@@ -104,26 +100,24 @@ macro_rules! gen_lexer {
 macro_rules! gen_parse {
     ($enumName:ident, $funcName:ident, $(($token:ident, $ansi:expr)), *) => {
         use logos::{Logos, Lexer};
-        fn $funcName(mut tokens: Lexer<$enumName, &str>) {
-            while tokens.token != $enumName::End {
-                match tokens.token {
+        fn $funcName(mut tokens: Lexer<$enumName>) {
+            while let Some(token) = tokens.next() {
+                match token {
                     $(
                         $enumName::$token => print!("\x1b[{}m{}\x1b[m", $ansi, tokens.slice()),
                     )*
                     _ => print!("{}", tokens.slice())
                 }
-                tokens.advance();
             }
         }
     };
     ($enumName:ident, $funcName:ident) => {
         use logos::{Logos, Lexer};
-        fn $funcName(mut tokens: Lexer<$enumName, &str>) {
-            while tokens.token != $enumName::End {
-                match tokens.token {
+        fn $funcName(mut tokens: Lexer<$enumName>) {
+            while let Some(token) = tokens.next() {
+                match token {
                     _ => print!("{}", tokens.slice())
                 }
-                tokens.advance();
             }
         }
     }
@@ -154,7 +148,7 @@ pub trait CommandLineTool {
     }
 
     fn start(&self) {
-        if is_tty(&File::open("/dev/stdin").unwrap()) {
+        if stdin().is_tty() {
             self.repl();
             exit(0)
         }
@@ -195,17 +189,13 @@ pub trait CommandLineTool {
                     } => match m {
                         KeyCode::Char(v) => match z {
                             KeyModifiers::CONTROL => {
-                                buffer.clear();
-                                cursor_position = 0;
                                 match v {
                                     'd' => {
                                         disable_raw_mode().unwrap();
                                         println!();
                                         exit(0);
                                     }
-                                    _ => {
-                                        continue;
-                                    }
+                                    _ => {}
                                 }
                             }
                             _ => {
