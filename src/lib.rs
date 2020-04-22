@@ -1,7 +1,7 @@
 use crossterm::{
     event::{read, Event, KeyCode, KeyModifiers},
     terminal::{disable_raw_mode, enable_raw_mode},
-    tty::IsTty
+    tty::IsTty,
 };
 use std::{
     fmt,
@@ -188,16 +188,14 @@ pub trait CommandLineTool {
                         modifiers: z,
                     } => match m {
                         KeyCode::Char(v) => match z {
-                            KeyModifiers::CONTROL => {
-                                match v {
-                                    'd' => {
-                                        disable_raw_mode().unwrap();
-                                        println!();
-                                        exit(0);
-                                    }
-                                    _ => {}
+                            KeyModifiers::CONTROL => match v {
+                                'd' => {
+                                    disable_raw_mode().unwrap();
+                                    println!();
+                                    exit(0);
                                 }
-                            }
+                                _ => {}
+                            },
                             _ => {
                                 buffer.insert(cursor_position, v);
                                 cursor_position += 1;
