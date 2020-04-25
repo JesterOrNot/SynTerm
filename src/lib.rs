@@ -100,11 +100,23 @@ macro_rules! gen_lexer {
 macro_rules! gen_parse {
     ($enumName:ident, $funcName:ident, $(($token:ident, $ansi:expr)), *) => {
         use logos::{Logos, Lexer};
+        let mut CSI = "";
+        if cfg!(not(target_os = "linux")) {
+            CSI = "$([char]27)";
+        } else {
+            CSI = r"\x1b";
+        }
         fn $funcName(mut tokens: Lexer<$enumName>) {
+            let mut CSI = "";
+            if cfg!(target_os = "windows") {
+                CSI = "$([char]27)";
+            } else {
+                CSI = r"\x1b";
+            }
             while let Some(token) = tokens.next() {
                 match token {
                     $(
-                        $enumName::$token => print!("\x1b[{}m{}\x1b[m", $ansi, tokens.slice()),
+                        $enumName::$token => print!("{}[{}m{}{}[m", CSI, $ansi, tokens.slice(), CSI),
                     )*
                     _ => print!("{}", tokens.slice())
                 }
@@ -159,6 +171,12 @@ pub trait CommandLineTool {
 
     /// Starts the REPL
     fn repl(&self) {
+        let mut CSI = "";
+        if cfg!(target_os = "windows") {
+            CSI = "$([char]27)";
+        } else {
+            CSI = r"\x1b";
+        }
         let mut cursor_position = 0;
         let mut file = OpenOptions::new()
             .create(true)
@@ -171,12 +189,14 @@ pub trait CommandLineTool {
         loop {
             enable_raw_mode().unwrap();
             // Move to the left, clear line, print prompt
-            print!("\x1b[1000D\x1b[0K{}\x1b[m", Self::PROMPT);
+            print!("{}[1000D{}[0K{}{}[m", CSI, CSI, Self::PROMPT, CSI);
             // Print buffer
             Self::syntax_highlight(&buffer);
             // Move to the left and move to the right cursor position
             print!(
-                "\x1b[1000D\x1b[{}C",
+                "{}[1000D{}[{}C",
+                CSI,
+                CSI,
                 cursor_position + calculate_whitespace(Self::PROMPT)
             );
             stdout().flush().unwrap();
@@ -223,9 +243,9 @@ pub trait CommandLineTool {
                             } else {
                                 position = lines_from_file(Self::HISTORY_FILE_PATH).count();
                             }
-                            print!("\x1b[1000D\x1b[0K{}", Self::PROMPT);
+                            print!("{}[1000D{}[0K{}", CSI, CSI, Self::PROMPT);
                             buffer = Self::get_hist(position);
-                            print!("\x1b[1000D");
+                            print!("{}[1000D", CSI);
                             cursor_position = buffer.len();
                         }
                         KeyCode::Down => {
