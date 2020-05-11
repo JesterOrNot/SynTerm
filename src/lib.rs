@@ -83,6 +83,8 @@ macro_rules! gen_lexer {
                 #[regex($target)]
                 $token,
             )*
+            #[regex("[a-zA-Z0-9_$]+", priority = 1)]
+            NoHighlight
         }
     };
     ($enumName:ident) => {
@@ -91,7 +93,9 @@ macro_rules! gen_lexer {
             #[error]
             Error,
             #[token(" ")]
-            Whitespace
+            Whitespace,
+            #[regex("[a-zA-Z0-9_$]+", priority = 1)]
+            NoHighlight
         }
     };
 }

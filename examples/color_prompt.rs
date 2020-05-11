@@ -20,8 +20,7 @@ impl CommandLineTool for MyTool {
             (Red, Color::Red, "red"),
             (Keyword, Color::Yellow, "exit"),
             (Green, Color::Green, "green"),
-            (Blue, Color::Blue, "blue"),
-            (NoHighlight, Color::White, "[a-zA-Z0-9_$]+")
+            (Blue, Color::Blue, "blue")
         );
         parser(TheLexer::lexer(string));
     }
