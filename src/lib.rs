@@ -3,10 +3,10 @@ use crossterm::{
     terminal::{disable_raw_mode, enable_raw_mode},
     tty::IsTty,
 };
+use colored::*;
 use std::{
-    fmt,
     fs::{File, OpenOptions},
-    io::{stdin, stdout, BufRead, BufReader, Write},
+    io::{self, stdin, stdout, BufRead, BufReader, Write},
     path::Path,
     process::exit,
 };
@@ -22,16 +22,16 @@ pub enum Color {
     Cyan,
 }
 
-impl fmt::Display for Color {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl Color {
+    pub fn write(&self, text: &str) -> Result<(), io::Error> {
         match *self {
-            Self::White => write!(f, "26"),
-            Self::Red => write!(f, "31"),
-            Self::Green => write!(f, "32"),
-            Self::Yellow => write!(f, "33"),
-            Self::Blue => write!(f, "34"),
-            Self::Magenta => write!(f, "35"),
-            Self::Cyan => write!(f, "36"),
+            Self::White => write!(stdout(),"{}", text.white()),
+            Self::Red => write!(stdout(), "{}", text.red()),
+            Self::Green => write!(stdout(), "{}", text.green()),
+            Self::Yellow => write!(stdout(), "{}", text.yellow()),
+            Self::Blue => write!(stdout(), "{}", text.blue()),
+            Self::Magenta => write!(stdout(), "{}", text.magenta()),
+            Self::Cyan => write!(stdout(), "{}", text.cyan()),
         }
     }
 }
@@ -104,14 +104,15 @@ macro_rules! gen_lexer {
 macro_rules! gen_parse {
     ($enumName:ident, $funcName:ident, $(($token:ident, $ansi:expr)), *) => {
         use logos::{Logos, Lexer};
+        use std::io::{Write, stdout};
         fn $funcName(mut tokens: Lexer<$enumName>) {
             while let Some(token) = tokens.next() {
                 match token {
                     $(
-                        $enumName::$token => print!("\x1b[{}m{}\x1b[m", $ansi, tokens.slice()),
+                        $enumName::$token => $ansi.write(tokens.slice()),
                     )*
-                    _ => print!("{}", tokens.slice())
-                }
+                    _ => write!(stdout(), "{}", tokens.slice()),
+                };
             }
         }
     };
