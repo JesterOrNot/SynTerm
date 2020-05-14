@@ -1,9 +1,9 @@
+use colored::*;
 use crossterm::{
     event::{read, Event, KeyCode, KeyModifiers},
     terminal::{disable_raw_mode, enable_raw_mode},
     tty::IsTty,
 };
-use colored::*;
 use std::{
     fs::{File, OpenOptions},
     io::{stdin, stdout, BufRead, BufReader, Write},
