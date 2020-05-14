@@ -6,7 +6,7 @@ use crossterm::{
 use colored::*;
 use std::{
     fs::{File, OpenOptions},
-    io::{self, stdin, stdout, BufRead, BufReader, Write},
+    io::{stdin, stdout, BufRead, BufReader, Write},
     path::Path,
     process::exit,
 };
@@ -23,15 +23,15 @@ pub enum Color {
 }
 
 impl Color {
-    pub fn write(&self, text: &str) -> Result<(), io::Error> {
+    pub fn write(&self, text: &str) {
         match *self {
-            Self::White => write!(stdout(),"{}", text.white()),
-            Self::Red => write!(stdout(), "{}", text.red()),
-            Self::Green => write!(stdout(), "{}", text.green()),
-            Self::Yellow => write!(stdout(), "{}", text.yellow()),
-            Self::Blue => write!(stdout(), "{}", text.blue()),
-            Self::Magenta => write!(stdout(), "{}", text.magenta()),
-            Self::Cyan => write!(stdout(), "{}", text.cyan()),
+            Self::White => print!("{}", text.white()),
+            Self::Red => print!("{}", text.red()),
+            Self::Green => print!("{}", text.green()),
+            Self::Yellow => print!("{}", text.yellow()),
+            Self::Blue => print!("{}", text.blue()),
+            Self::Magenta => print!("{}", text.magenta()),
+            Self::Cyan => print!("{}", text.cyan()),
         }
     }
 }
@@ -111,8 +111,8 @@ macro_rules! gen_parse {
                     $(
                         $enumName::$token => $ansi.write(tokens.slice()),
                     )*
-                    _ => write!(stdout(), "{}", tokens.slice()),
-                };
+                    _ => print!("{}", tokens.slice()),
+                }
             }
         }
     };
